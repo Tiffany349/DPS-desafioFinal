@@ -1,6 +1,7 @@
 import axios from 'axios';
 import React, { useState } from 'react';
-import { View, TextInput, Button, Alert } from 'react-native';
+import { View, TextInput, Button, Alert, StyleSheet } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
@@ -13,45 +14,50 @@ export default function LoginScreen({ navigation }) {
         password
       });
 
-      Alert.alert('Éxito', res.data.message);
+      // Guardar token
+      await AsyncStorage.setItem('token', res.data.token);
+
+      Alert.alert('Éxito', 'Login exitoso');
       navigation.navigate('ProductList');
 
     } catch (err) {
       console.log('ERROR LOGIN:', err.response?.data || err.message);
-
-      Alert.alert(
-        'Error',
-        err.response?.data?.error || 'Servidor no accesible'
-      );
+      Alert.alert('Error', 'Credenciales inválidas o servidor no accesible');
     }
   };
 
   return (
-    <View style={{ padding: 20 }}>
+    <View style={styles.container}>
       <TextInput
-        placeholder="Email"
+        style={styles.input}
+        placeholder="Correo"
         value={email}
         onChangeText={setEmail}
-        style={{
-          borderWidth: 1,
-          marginBottom: 10,
-          padding: 10
-        }}
       />
 
       <TextInput
-        placeholder="Password"
-        value={password}
+        style={styles.input}
+        placeholder="Contraseña"
         secureTextEntry
+        value={password}
         onChangeText={setPassword}
-        style={{
-          borderWidth: 1,
-          marginBottom: 10,
-          padding: 10
-        }}
       />
 
       <Button title="Ingresar" onPress={handleLogin} />
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    padding: 20
+  },
+  input: {
+    borderWidth: 1,
+    marginBottom: 15,
+    padding: 10,
+    borderRadius: 8
+  }
+});

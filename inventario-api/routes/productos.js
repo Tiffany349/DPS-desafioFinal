@@ -1,20 +1,22 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db');
+const auth = require('../middleware/auth');
 
-// Obtener todos los productos
-router.get('/', async (req, res) => {
+// Obtener todos
+router.get('/', auth, async (req, res) => {
   try {
     const [rows] = await db.query('SELECT * FROM productos');
     res.json(rows);
   } catch (err) {
-    console.log('ERROR GET PRODUCTOS:', err);
-    res.status(500).json({ error: 'Error al obtener productos' });
+    res.status(500).json({
+      error: 'Error al obtener productos'
+    });
   }
 });
 
-// Obtener producto por ID
-router.get('/:id', async (req, res) => {
+// Obtener por ID
+router.get('/:id', auth, async (req, res) => {
   try {
     const [rows] = await db.query(
       'SELECT * FROM productos WHERE id = ?',
@@ -28,22 +30,18 @@ router.get('/:id', async (req, res) => {
     }
 
     res.json(rows[0]);
+
   } catch (err) {
-    console.log('ERROR GET PRODUCTO:', err);
-    res.status(500).json({ error: 'Error al obtener producto' });
+    res.status(500).json({
+      error: 'Error al obtener producto'
+    });
   }
 });
 
 // Agregar producto
-router.post('/', async (req, res) => {
+router.post('/', auth, async (req, res) => {
   try {
     const { nombre, precio, stock } = req.body;
-
-    if (!nombre || precio == null || stock == null) {
-      return res.status(400).json({
-        error: 'Faltan datos del producto'
-      });
-    }
 
     const [result] = await db.query(
       'INSERT INTO productos (nombre, precio, stock) VALUES (?, ?, ?)',
@@ -58,7 +56,6 @@ router.post('/', async (req, res) => {
     });
 
   } catch (err) {
-    console.log('ERROR POST PRODUCTO:', err);
     res.status(500).json({
       error: 'Error al agregar producto'
     });
@@ -66,15 +63,13 @@ router.post('/', async (req, res) => {
 });
 
 // Actualizar stock
-router.put('/:id', async (req, res) => {
+router.put('/:id', auth, async (req, res) => {
   try {
     const { stock } = req.body;
 
-    console.log('PUT recibido:', req.params.id, stock);
-
-    if (stock == null || isNaN(stock)) {
+    if (stock < 0) {
       return res.status(400).json({
-        error: 'Stock inválido'
+        error: 'No se permite stock negativo'
       });
     }
 
@@ -97,8 +92,6 @@ router.put('/:id', async (req, res) => {
     res.json(rows[0]);
 
   } catch (err) {
-    console.log('ERROR PUT PRODUCTO:', err);
-
     res.status(500).json({
       error: 'Error al actualizar stock'
     });

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Text, Alert } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 
 export default function QRScannerScreen({ navigation }) {
@@ -23,12 +24,16 @@ export default function QRScannerScreen({ navigation }) {
     setScanned(true);
 
     try {
+      const token = await AsyncStorage.getItem('token');
       console.log('QR leído:', data);
-
-      // Si es un número → buscar producto
       if (!isNaN(data)) {
         const res = await axios.get(
-          `http://192.168.0.18:3000/productos/${data}`
+          `http://192.168.0.18:3000/productos/${data}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
         );
 
         navigation.navigate('ProductDetail', {
@@ -39,32 +44,31 @@ export default function QRScannerScreen({ navigation }) {
         let producto;
 
         try {
-          producto = JSON.parse(data);
+        producto = JSON.parse(data.trim());
         } catch {
-          Alert.alert(
-            'QR inválido',
-            'El código no contiene un producto válido'
-          );
+          Alert.alert('Error', 'QR inválido');
           setScanned(false);
           return;
         }
 
         await axios.post(
           'http://192.168.0.18:3000/productos',
-          producto
+          producto,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
         );
 
         Alert.alert('Éxito', 'Producto agregado');
-
         navigation.navigate('ProductList');
       }
 
     } catch (err) {
-      console.log('ERROR QR:', err.response?.data || err.message);
-
       Alert.alert(
         'Error',
-        'No se pudo procesar el QR'
+        err.response?.data?.error || 'No se pudo procesar el QR'
       );
     }
 
@@ -75,11 +79,9 @@ export default function QRScannerScreen({ navigation }) {
     <CameraView
       style={{ flex: 1 }}
       barcodeScannerSettings={{
-        barcodeTypes: ['qr'],
+        barcodeTypes: ['qr']
       }}
-      onBarcodeScanned={
-        scanned ? undefined : handleBarCodeScanned
-      }
+      onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
     />
   );
 }
