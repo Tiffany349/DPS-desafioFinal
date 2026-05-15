@@ -554,6 +554,9 @@ nombre: Mouse
 
 Proyecto académico desarrollado como implementación práctica de:
 
+Javier Alexander Ramos Garcia – RG251044 
+Tiffany Nahomy Benitez Reyes – BR250073
+
 - React Native
 - API REST
 - Seguridad JWT
