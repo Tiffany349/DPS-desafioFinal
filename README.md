@@ -1,6 +1,9 @@
 Javier Alexander Ramos Garcia – RG251044 
 Tiffany Nahomy Benitez Reyes – BR250073
 
+#Link del video 
+https://youtu.be/cRNe7mOvJlY?si=8aYwIi4JBo_JaptX
+
 # Sistema de Inventario Inteligente
 
 ## Descripción del Proyecto
