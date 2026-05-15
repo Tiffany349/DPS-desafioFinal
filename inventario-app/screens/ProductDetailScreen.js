@@ -1,11 +1,13 @@
+
+
 import React, { useState } from 'react';
 import {
   View,
   Text,
   TextInput,
-  Button,
   Alert,
-  StyleSheet
+  StyleSheet,
+  TouchableOpacity
 } from 'react-native';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -22,11 +24,6 @@ export default function ProductDetailScreen({ route }) {
 
     if (isNaN(stockNumero)) {
       Alert.alert('Error', 'Ingrese un número válido');
-      return;
-    }
-
-    if (stockNumero < 0) {
-      Alert.alert('Error', 'No se permite stock negativo');
       return;
     }
 
@@ -51,32 +48,43 @@ export default function ProductDetailScreen({ route }) {
       Alert.alert('Éxito', 'Stock actualizado');
 
     } catch (err) {
-      console.log(err.response?.data || err.message);
-
-      Alert.alert(
-        'Error',
-        err.response?.data?.error || 'No se pudo actualizar'
-      );
+      Alert.alert('Error', 'No se pudo actualizar');
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>{detalle.nombre}</Text>
-      <Text>Precio: ${detalle.precio}</Text>
-      <Text>Stock actual: {detalle.stock}</Text>
 
-      <TextInput
-        style={styles.input}
-        value={nuevoStock}
-        onChangeText={setNuevoStock}
-        keyboardType="numeric"
-      />
+      <View style={styles.card}>
 
-      <Button
-        title="Actualizar Stock"
-        onPress={actualizarStock}
-      />
+        <Text style={styles.title}>{detalle.nombre}</Text>
+
+        <Text style={styles.info}>
+          Precio: ${detalle.precio}
+        </Text>
+
+        <Text style={styles.stock}>
+          Stock actual: {detalle.stock}
+        </Text>
+
+        <TextInput
+          style={styles.input}
+          value={nuevoStock}
+          onChangeText={setNuevoStock}
+          keyboardType="numeric"
+          placeholder="Nuevo stock"
+          placeholderTextColor="#94A3B8"
+        />
+
+        <TouchableOpacity
+          style={styles.button}
+          onPress={actualizarStock}
+        >
+          <Text style={styles.buttonText}>Actualizar Stock</Text>
+        </TouchableOpacity>
+
+      </View>
+
     </View>
   );
 }
@@ -84,17 +92,57 @@ export default function ProductDetailScreen({ route }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#1A120B',
+    justifyContent: 'center',
     padding: 20
   },
-  title: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    marginBottom: 20
+
+  card: {
+    backgroundColor: '#3C2A21',
+    padding: 25,
+    borderRadius: 20
   },
+
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#FFB703',
+    marginBottom: 20,
+    textAlign: 'center'
+  },
+
+  info: {
+    color: '#fff',
+    fontSize: 18,
+    marginBottom: 10
+  },
+
+  stock: {
+    color: '#FFB703',
+    fontSize: 18,
+    marginBottom: 20,
+    fontWeight: 'bold'
+  },
+
   input: {
-    borderWidth: 1,
-    padding: 10,
-    marginVertical: 20,
-    borderRadius: 8
+    backgroundColor: '#5C3D2E',
+    color: '#fff',
+    padding: 15,
+    borderRadius: 12,
+    marginBottom: 20,
+    fontSize: 16
+  },
+
+  button: {
+    backgroundColor: '#E76F51',
+    padding: 15,
+    borderRadius: 12,
+    alignItems: 'center'
+  },
+
+  buttonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 18
   }
 });

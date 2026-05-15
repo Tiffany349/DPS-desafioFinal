@@ -1,25 +1,28 @@
-const express = require('express');
+const express = require('express');//.
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const productosRoutes = require('./routes/productos');
 const db = require('./db');
 
-const app = express();
+const app = express();//.
 
-app.use(cors());
-app.use(express.json());
+app.use(cors());//..
+app.use(express.json());//..
 
-// LOGIN
+// Ruta LOGIN
 app.post('/login', async (req, res) => {
+  //Extraer datos
   const { email, password } = req.body;
 
   console.log('Intento login:', email, password);
 
   try {
+    //consulta sql
     const [rows] = await db.query(
-      'SELECT * FROM usuarios WHERE email = ? AND password = ?',
+      'SELECT * FROM usuarios WHERE email = ? AND password = ?',//.....
       [email, password]
     );
+    //validación
 
     if (rows.length === 0) {
       return res.status(401).json({
@@ -29,7 +32,7 @@ app.post('/login', async (req, res) => {
 
     const usuario = rows[0];
 
-    // JWT real
+    //  crea JWT real ........................
     const token = jwt.sign(
       {
         id: usuario.id,
@@ -40,7 +43,7 @@ app.post('/login', async (req, res) => {
         expiresIn: '1h'
       }
     );
-
+    //Respuesta
     res.json({
       message: 'Login exitoso',
       token
@@ -59,6 +62,7 @@ app.use('/productos', productosRoutes);
 
 const PORT = 3000;
 
+//...
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });

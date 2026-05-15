@@ -12,12 +12,16 @@ const Stack = createStackNavigator();
 export default function AppNavigator() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="ProductList">
-        <Stack.Screen 
-          name="ProductList" 
-          component={ProductListScreen} 
-          options={{ title: 'Lista de Productos' }}
-        />
+      <Stack.Navigator
+  screenOptions={{
+    headerStyle: {
+      backgroundColor: '#fff'
+    },
+    headerTintColor: '#5C3D2E',
+    headerTitleStyle: {
+      fontWeight: 'bold'
+    }
+  }}>
         <Stack.Screen 
           name="QRScanner" 
           component={QRScannerScreen} 

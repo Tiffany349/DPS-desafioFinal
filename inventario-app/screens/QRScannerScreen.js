@@ -5,9 +5,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 
 export default function QRScannerScreen({ navigation }) {
+  //permisos de camara
   const [permission, requestPermission] = useCameraPermissions();
   const [scanned, setScanned] = useState(false);
-
+  //solicitar permiso
   useEffect(() => {
     requestPermission();
   }, []);
@@ -19,14 +20,15 @@ export default function QRScannerScreen({ navigation }) {
   if (!permission.granted) {
     return <Text>Permiso denegado</Text>;
   }
-
+  //funcion principal
   const handleBarCodeScanned = async ({ data }) => {
     setScanned(true);
 
     try {
       const token = await AsyncStorage.getItem('token');
       console.log('QR leído:', data);
-      if (!isNaN(data)) {
+      //numero
+      if (!isNaN(data)) { //buscar produ
         const res = await axios.get(
           `http://192.168.0.18:3000/productos/${data}`,
           {
@@ -35,7 +37,7 @@ export default function QRScannerScreen({ navigation }) {
             }
           }
         );
-
+        //navegar al detalle
         navigation.navigate('ProductDetail', {
           producto: res.data
         });
@@ -50,7 +52,7 @@ export default function QRScannerScreen({ navigation }) {
           setScanned(false);
           return;
         }
-
+        //registramos producto
         await axios.post(
           'http://192.168.0.18:3000/productos',
           producto,
@@ -76,6 +78,23 @@ export default function QRScannerScreen({ navigation }) {
   };
 
   return (
+    //camara
+    <CameraView
+      style={{ flex: 1 }}
+      //configuración qr
+      barcodeScannerSettings={{
+        barcodeTypes: ['qr']
+      }}
+      //evento      sbe
+      onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
+    />
+  );
+
+  
+
+return (
+  <View style={{ flex: 1, backgroundColor: '#000' }}>
+
     <CameraView
       style={{ flex: 1 }}
       barcodeScannerSettings={{
@@ -83,5 +102,30 @@ export default function QRScannerScreen({ navigation }) {
       }}
       onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
     />
-  );
-}
+
+    <View style={styles.overlay}>
+      <Text style={styles.scanText}>
+        Escanea un código QR
+      </Text>
+    </View>
+
+  </View>
+);
+
+const styles = {
+  overlay: {
+    position: 'absolute',
+    bottom: 50,
+    width: '100%',
+    alignItems: 'center'
+  },
+
+  scanText: {
+    color: '#fff',
+    fontSize: 22,
+    fontWeight: 'bold',
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    padding: 15,
+    borderRadius: 15
+  }
+}};

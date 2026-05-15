@@ -9,8 +9,8 @@ const auth = (req, res, next) => {
     });
   }
 
-  const token = authHeader.split(' ')[1];
-
+  const token = authHeader.split(' ')[1];//.
+//..
   jwt.verify(token, 'mi_clave_secreta', (err, user) => {
     if (err) {
       return res.status(403).json({
